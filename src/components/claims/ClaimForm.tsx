@@ -1,35 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { FileText, ArrowLeft, Upload, Save, Send, X, Building2, FileCheck } from 'lucide-react';
 import Select from 'react-select';
 import ClaimEditor from '../editor/ClaimEditor';
 import { generateClaimId } from '../../utils/claimIdGenerator';
-
-const VOIVODESHIPS = [
-  { value: 'dolnoslaskie', label: 'Dolnośląskie' },
-  { value: 'kujawsko-pomorskie', label: 'Kujawsko-pomorskie' },
-  { value: 'lubelskie', label: 'Lubelskie' },
-  { value: 'lubuskie', label: 'Lubuskie' },
-  { value: 'lodzkie', label: 'Łódzkie' },
-  { value: 'malopolskie', label: 'Małopolskie' },
-  { value: 'mazowieckie', label: 'Mazowieckie' },
-  { value: 'opolskie', label: 'Opolskie' },
-  { value: 'podkarpackie', label: 'Podkarpackie' },
-  { value: 'podlaskie', label: 'Podlaskie' },
-  { value: 'pomorskie', label: 'Pomorskie' },
-  { value: 'slaskie', label: 'Śląskie' },
-  { value: 'swietokrzyskie', label: 'Świętokrzyskie' },
-  { value: 'warminsko-mazurskie', label: 'Warmińsko-Mazurskie' },
-  { value: 'wielkopolskie', label: 'Wielkopolskie' },
-  { value: 'zachodniopomorskie', label: 'Zachodniopomorskie' }
-];
+import { getUniqueVoivodeships, getCountiesForVoivodeship, getCommunitiesForCounty } from '../../utils/locationHelpers';
 
 const MINISTRIES = [
-  { value: 'mswia', label: 'MSWiA' },
-  { value: 'mrpit', label: 'MRPiT' },
-  { value: 'mf', label: 'MF' },
-  { value: 'mkis', label: 'MKiŚ' },
-  { value: 'miir', label: 'MIiR' },
+  { value: 'map', label: 'MAP - Ministerstwo Aktywów Państwowych' },
+  { value: 'mc', label: 'MC - Ministerstwo Cyfryzacji' },
+  { value: 'men', label: 'MEN - Ministerstwo Edukacji Narodowej' },
+  { value: 'mf', label: 'MF - Ministerstwo Finansów' },
+  { value: 'mfipr', label: 'MFiPR - Ministerstwo Funduszy i Polityki Regionalnej' },
+  { value: 'mi', label: 'MI - Ministerstwo Infrastruktury' },
+  { value: 'mkis', label: 'MKiŚ - Ministerstwo Klimatu i Środowiska' },
+  { value: 'mkidn', label: 'MKiDN - Ministerstwo Kultury i Dziedzictwa Narodowego' },
+  { value: 'mnisw', label: 'MNiSW - Ministerstwo Nauki i Szkolnictwa Wyższego' },
+  { value: 'mon', label: 'MON - Ministerstwo Obrony Narodowej' },
+  { value: 'mp', label: 'MP - Ministerstwo Przemysłu' },
+  { value: 'mrpips', label: 'MRPiPS - Ministerstwo Rodziny, Pracy i Polityki Społecznej' },
+  { value: 'mrirw', label: 'MRiRW - Ministerstwo Rolnictwa i Rozwoju Wsi' },
+  { value: 'mrit', label: 'MRiT - Ministerstwo Rozwoju i Technologii' },
+  { value: 'msit', label: 'MSiT - Ministerstwo Sportu i Turystyki' },
+  { value: 'mswia', label: 'MSWiA - Ministerstwo Spraw Wewnętrznych i Administracji' },
+  { value: 'msz', label: 'MSZ - Ministerstwo Spraw Zagranicznych' },
+  { value: 'ms', label: 'MS - Ministerstwo Sprawiedliwości' },
+  { value: 'mz', label: 'MZ - Ministerstwo Zdrowia' },
+  { value: 'wfosigw', label: 'WFOŚiGW - Wojewódzki Fundusz Ochrony Środowiska i Gospodarki Wodnej' },
+  { value: 'nfosigw', label: 'NFOŚiGW - Narodowy Fundusz Ochrony Środowiska i Gospodarki Wodnej' },
   { value: 'inne', label: 'Inne' }
 ];
 
@@ -58,6 +56,8 @@ export default function ClaimForm({
   const [selectedMinistries, setSelectedMinistries] = useState<string[]>(initialData?.otherFundingSources || []);
   const [otherMinistry, setOtherMinistry] = useState('');
   const [claimId] = useState(initialData?.id || generateClaimId());
+  const [selectedVoivodeship, setSelectedVoivodeship] = useState<string>(initialData?.voivodeship || defaultVoivodeship || '');
+  const [selectedCounty, setSelectedCounty] = useState<string>(initialData?.county || '');
 
   const {
     register,
@@ -82,6 +82,32 @@ export default function ClaimForm({
   });
 
   const finalNetAmount = watch('finalNetAmount');
+
+  useEffect(() => {
+    if (finalNetAmount) {
+      setValue('requestedAmount', finalNetAmount);
+    }
+  }, [finalNetAmount, setValue]);
+
+  const voivodeships = getUniqueVoivodeships();
+  const counties = getCountiesForVoivodeship(selectedVoivodeship);
+  const communities = getCommunitiesForCounty(selectedVoivodeship, selectedCounty);
+
+  const handleVoivodeshipChange = (selected: any) => {
+    const newVoivodeship = selected?.value || '';
+    setSelectedVoivodeship(newVoivodeship);
+    setSelectedCounty('');
+    setValue('voivodeship', newVoivodeship);
+    setValue('county', '');
+    setValue('commune', '');
+  };
+
+  const handleCountyChange = (selected: any) => {
+    const newCounty = selected?.value || '';
+    setSelectedCounty(newCounty);
+    setValue('county', newCounty);
+    setValue('commune', '');
+  };
 
   const handleFormSubmit = async (data: any, isDraft: boolean) => {
     try {
@@ -199,6 +225,7 @@ export default function ClaimForm({
             <input
               type="text"
               {...register('commonName', { required: 'Nazwa zwyczajowa jest wymagana' })}
+              placeholder="np. Szkoła Podstawowa nr 1 im. Jana Kochanowskiego"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             />
             {errors.commonName && (
@@ -207,12 +234,27 @@ export default function ClaimForm({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 flex items-center gap-1">
               ID wniosku z Survey123
+              <div className="relative group">
+                <span className="cursor-help">ℹ️</span>
+                <div className="absolute right-0 w-80 p-2 bg-gray-800 text-white text-sm rounded shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 transform translate-x-2">
+                  Numer wniosku pobierzesz z aplikacji Survey123 która znajduje się pod adresem:{' '}
+                  <a 
+                    href="https://gis-portal.straz.gov.pl/portal/apps/webappviewer/index.html?id=b403009fa5ac4f6c8ea3791fc70afdf3"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-300 hover:text-blue-400 underline"
+                  >
+                    kliknij tutaj
+                  </a>
+                </div>
+              </div>
             </label>
             <input
               type="text"
               {...register('surveyId', { required: 'ID wniosku jest wymagane' })}
+              placeholder="np. 4056 (ID z aplikacji Survey123)"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             />
             {errors.surveyId && (
@@ -227,6 +269,7 @@ export default function ClaimForm({
             <input
               type="text"
               {...register('objectName', { required: 'Nazwa obiektu jest wymagana' })}
+              placeholder="np. Budynek główny szkoły podstawowej"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             />
             {errors.objectName && (
@@ -241,6 +284,7 @@ export default function ClaimForm({
             <input
               type="text"
               {...register('address', { required: 'Adres jest wymagany' })}
+              placeholder="np. ul. Szkolna 1, 00-001 Warszawa"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             />
             {errors.address && (
@@ -254,11 +298,12 @@ export default function ClaimForm({
             </label>
             <input
               type="number"
-              step="0.01"
+              step="100"
               {...register('finalNetAmount', {
                 required: 'Kwota jest wymagana',
                 min: { value: 0, message: 'Kwota nie może być ujemna' }
               })}
+              placeholder="np. 150000.00 (kwota netto bez VAT)"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             />
             {errors.finalNetAmount && (
@@ -272,11 +317,12 @@ export default function ClaimForm({
             </label>
             <input
               type="number"
-              step="0.01"
+              step="100"
               {...register('requestedAmount', {
                 required: 'Kwota jest wymagana',
                 min: { value: 0, message: 'Kwota nie może być ujemna' }
               })}
+              placeholder="np. 120000.00 (wnioskowana kwota dofinansowania)"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             />
             {errors.requestedAmount && (
@@ -316,10 +362,10 @@ export default function ClaimForm({
               Województwo
             </label>
             <Select
-              options={VOIVODESHIPS}
-              value={VOIVODESHIPS.find(v => v.value === watch('voivodeship'))}
-              onChange={(selected) => setValue('voivodeship', selected?.value || '')}
-              isDisabled={userData?.role === 'user'} // Only disable for regular users
+              options={voivodeships.map(v => ({ value: v, label: v }))}
+              value={selectedVoivodeship ? { value: selectedVoivodeship, label: selectedVoivodeship } : null}
+              onChange={handleVoivodeshipChange}
+              isDisabled={userData?.role === 'user'}
               className="mt-1"
               placeholder="Wybierz województwo..."
             />
@@ -332,10 +378,13 @@ export default function ClaimForm({
             <label className="block text-sm font-medium text-gray-700">
               Powiat
             </label>
-            <input
-              type="text"
-              {...register('county', { required: 'Powiat jest wymagany' })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            <Select
+              options={counties.map(c => ({ value: c, label: c }))}
+              value={selectedCounty ? { value: selectedCounty, label: selectedCounty } : null}
+              onChange={handleCountyChange}
+              isDisabled={!selectedVoivodeship}
+              className="mt-1"
+              placeholder="Wybierz powiat..."
             />
             {errors.county && (
               <p className="mt-1 text-sm text-red-600">{errors.county.message}</p>
@@ -346,10 +395,13 @@ export default function ClaimForm({
             <label className="block text-sm font-medium text-gray-700">
               Gmina
             </label>
-            <input
-              type="text"
-              {...register('commune', { required: 'Gmina jest wymagana' })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            <Select
+              options={communities.map(c => ({ value: c, label: c }))}
+              value={watch('commune') ? { value: watch('commune'), label: watch('commune') } : null}
+              onChange={(selected) => setValue('commune', selected?.value || '')}
+              isDisabled={!selectedCounty}
+              className="mt-1"
+              placeholder="Wybierz gminę..."
             />
             {errors.commune && (
               <p className="mt-1 text-sm text-red-600">{errors.commune.message}</p>

@@ -5,6 +5,8 @@ import type { RegistrationFormData } from '../types/user';
 import { ORGANIZATION_TYPES } from '../types/user';
 import FormInput from './FormInput';
 import { userService } from '../services/userService';
+import Footer from './Footer';
+import { getUniqueVoivodeships, getCountiesForVoivodeship, getCommunitiesForCounty } from '../utils/locationHelpers';
 
 interface RegistrationFormProps {
   onBack: () => void;
@@ -15,6 +17,8 @@ export default function RegistrationForm({ onBack }: RegistrationFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
+  const [selectedVoivodeship, setSelectedVoivodeship] = useState<string>('');
+  const [selectedCounty, setSelectedCounty] = useState<string>('');
   
   const {
     register,
@@ -23,6 +27,7 @@ export default function RegistrationForm({ onBack }: RegistrationFormProps) {
     watch,
     reset,
     trigger,
+    setValue,
   } = useForm<RegistrationFormData>({ mode: 'onChange' });
 
   const validateStep = async (step: number) => {
@@ -104,6 +109,24 @@ export default function RegistrationForm({ onBack }: RegistrationFormProps) {
     }
   };
 
+  const voivodeships = getUniqueVoivodeships();
+  const counties = getCountiesForVoivodeship(selectedVoivodeship);
+  const communities = getCommunitiesForCounty(selectedVoivodeship, selectedCounty);
+
+  const handleVoivodeshipChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newVoivodeship = event.target.value;
+    setSelectedVoivodeship(newVoivodeship);
+    setSelectedCounty(''); // Reset powiatu
+    setValue('county', '');
+    setValue('commune', ''); // Reset gminy
+  };
+
+  const handleCountyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newCounty = event.target.value;
+    setSelectedCounty(newCounty);
+    setValue('commune', ''); // Reset gminy przy zmianie powiatu
+  };
+
   if (isSubmitted) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
@@ -123,6 +146,7 @@ export default function RegistrationForm({ onBack }: RegistrationFormProps) {
             Powrót do strony głównej
           </button>
         </div>
+        <Footer />
       </div>
     );
   }
@@ -204,6 +228,7 @@ export default function RegistrationForm({ onBack }: RegistrationFormProps) {
                       error={errors.firstName}
                       validation={formValidation.firstName}
                       icon={<UserCheck className="w-5 h-5 text-gray-400" />}
+                      placeholder="Wprowadź swoje imię np. Jan"
                     />
 
                     <FormInput
@@ -213,6 +238,7 @@ export default function RegistrationForm({ onBack }: RegistrationFormProps) {
                       error={errors.lastName}
                       validation={formValidation.lastName}
                       icon={<UserCheck className="w-5 h-5 text-gray-400" />}
+                      placeholder="Wprowadź swoje nazwisko np. Kowalski"
                     />
 
                     <FormInput
@@ -221,8 +247,8 @@ export default function RegistrationForm({ onBack }: RegistrationFormProps) {
                       register={register}
                       error={errors.position}
                       validation={formValidation.position}
-                      placeholder="np. naczelnik, inspektor"
                       icon={<Briefcase className="w-5 h-5 text-gray-400" />}
+                      placeholder="np. Naczelnik Wydziału, Inspektor"
                     />
 
                     <FormInput
@@ -233,6 +259,7 @@ export default function RegistrationForm({ onBack }: RegistrationFormProps) {
                       error={errors.email}
                       validation={formValidation.email}
                       icon={<Mail className="w-5 h-5 text-gray-400" />}
+                      placeholder="jan.kowalski@urzad.gov.pl"
                     />
                   </div>
                 </div>
@@ -247,6 +274,7 @@ export default function RegistrationForm({ onBack }: RegistrationFormProps) {
                     error={errors.organizationName}
                     validation={formValidation.organizationName}
                     icon={<Building2 className="w-5 h-5 text-gray-400" />}
+                    placeholder="np. Urząd Miasta Warszawa, Starostwo Powiatowe w Krakowie"
                   />
 
                   <div>
@@ -278,8 +306,8 @@ export default function RegistrationForm({ onBack }: RegistrationFormProps) {
                     register={register}
                     error={errors.nip}
                     validation={formValidation.nip}
-                    placeholder="10 cyfr"
                     icon={<FileCheck className="w-5 h-5 text-gray-400" />}
+                    placeholder="Wprowadź 10 cyfr NIP np. 5252248481"
                   />
                 </div>
               )}
@@ -287,32 +315,90 @@ export default function RegistrationForm({ onBack }: RegistrationFormProps) {
               {currentStep === 3 && (
                 <div className="space-y-6 animate-fadeIn">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormInput
-                      label="Województwo"
-                      name="voivodeship"
-                      register={register}
-                      error={errors.voivodeship}
-                      validation={formValidation.voivodeship}
-                      icon={<MapPin className="w-5 h-5 text-gray-400" />}
-                    />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Województwo
+                      </label>
+                      <div className="mt-1 relative">
+                        <select
+                          {...register('voivodeship', formValidation.voivodeship)}
+                          onChange={(e) => {
+                            handleVoivodeshipChange(e);
+                            register('voivodeship').onChange(e);
+                          }}
+                          className="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                        >
+                          <option value="">Wybierz województwo</option>
+                          {voivodeships.map((voivodeship) => (
+                            <option key={voivodeship} value={voivodeship}>
+                              {voivodeship}
+                            </option>
+                          ))}
+                        </select>
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <MapPin className="w-5 h-5 text-gray-400" />
+                        </div>
+                      </div>
+                      {errors.voivodeship && (
+                        <p className="mt-1 text-sm text-red-600">{errors.voivodeship.message}</p>
+                      )}
+                    </div>
 
-                    <FormInput
-                      label="Powiat"
-                      name="county"
-                      register={register}
-                      error={errors.county}
-                      validation={formValidation.county}
-                      icon={<MapPin className="w-5 h-5 text-gray-400" />}
-                    />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Powiat
+                      </label>
+                      <div className="mt-1 relative">
+                        <select
+                          {...register('county', formValidation.county)}
+                          onChange={(e) => {
+                            handleCountyChange(e);
+                            register('county').onChange(e);
+                          }}
+                          disabled={!selectedVoivodeship}
+                          className="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100"
+                        >
+                          <option value="">Wybierz powiat</option>
+                          {counties.map((county) => (
+                            <option key={county} value={county}>
+                              {county}
+                            </option>
+                          ))}
+                        </select>
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <MapPin className="w-5 h-5 text-gray-400" />
+                        </div>
+                      </div>
+                      {errors.county && (
+                        <p className="mt-1 text-sm text-red-600">{errors.county.message}</p>
+                      )}
+                    </div>
 
-                    <FormInput
-                      label="Gmina"
-                      name="commune"
-                      register={register}
-                      error={errors.commune}
-                      validation={formValidation.commune}
-                      icon={<MapPin className="w-5 h-5 text-gray-400" />}
-                    />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Gmina
+                      </label>
+                      <div className="mt-1 relative">
+                        <select
+                          {...register('commune', formValidation.commune)}
+                          disabled={!selectedCounty}
+                          className="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100"
+                        >
+                          <option value="">Wybierz gminę</option>
+                          {communities.map((community) => (
+                            <option key={community} value={community}>
+                              {community}
+                            </option>
+                          ))}
+                        </select>
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <MapPin className="w-5 h-5 text-gray-400" />
+                        </div>
+                      </div>
+                      {errors.commune && (
+                        <p className="mt-1 text-sm text-red-600">{errors.commune.message}</p>
+                      )}
+                    </div>
 
                     <FormInput
                       label="Telefon kontaktowy"
@@ -322,6 +408,7 @@ export default function RegistrationForm({ onBack }: RegistrationFormProps) {
                       error={errors.phone}
                       validation={formValidation.phone}
                       icon={<Phone className="w-5 h-5 text-gray-400" />}
+                      placeholder="9 cyfr bez spacji np. 123456789"
                     />
                   </div>
 
@@ -332,6 +419,7 @@ export default function RegistrationForm({ onBack }: RegistrationFormProps) {
                     error={errors.address}
                     validation={formValidation.address}
                     icon={<MapPin className="w-5 h-5 text-gray-400" />}
+                    placeholder="np. ul. Marszałkowska 1, 00-001 Warszawa"
                   />
                 </div>
               )}
@@ -346,6 +434,7 @@ export default function RegistrationForm({ onBack }: RegistrationFormProps) {
                     error={errors.password}
                     validation={formValidation.password}
                     icon={<Lock className="w-5 h-5 text-gray-400" />}
+                    placeholder="Minimum 8 znaków, użyj liter i cyfr"
                   />
 
                   <FormInput
@@ -359,6 +448,7 @@ export default function RegistrationForm({ onBack }: RegistrationFormProps) {
                       validate: (val: string) => watch('password') === val || 'Hasła nie są identyczne'
                     }}
                     icon={<Lock className="w-5 h-5 text-gray-400" />}
+                    placeholder="Powtórz wprowadzone hasło"
                   />
                 </div>
               )}
@@ -405,6 +495,7 @@ export default function RegistrationForm({ onBack }: RegistrationFormProps) {
             </form>
           </div>
         </div>
+       
       </div>
     </div>
   );
