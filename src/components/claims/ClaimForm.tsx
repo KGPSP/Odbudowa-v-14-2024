@@ -172,326 +172,325 @@ export default function ClaimForm({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm">
-      <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+      <div className="px-8 py-6 border-b border-gray-200 bg-gradient-to-r from-indigo-600 to-blue-600 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <FileText className="w-6 h-6 text-indigo-600" />
-          <h2 className="text-xl font-semibold text-gray-800">
+          <FileText className="w-8 h-8 text-white" />
+          <h2 className="text-2xl font-bold text-white">
             {initialData ? 'Edycja wniosku' : 'Nowy wniosek'}
           </h2>
         </div>
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+          className="flex items-center gap-2 text-white hover:text-gray-100 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Powrót
         </button>
       </div>
 
-      <form onSubmit={handleSubmit((data) => handleFormSubmit(data, false))} className="p-6 space-y-6">
+      <form onSubmit={handleSubmit((data) => handleFormSubmit(data, false))} className="p-8">
         {userData && (
-          <div className="bg-gray-50 p-4 rounded-lg mb-6">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Dane składającego wniosek</h3>
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl mb-8 border border-indigo-100">
+            <h3 className="text-base font-semibold text-indigo-900 mb-4">Dane składającego wniosek</h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-gray-500">Nazwa jednostki:</span>
-                <span className="ml-2 text-gray-900">{userData.organizationName}</span>
+                <span className="text-indigo-600 font-medium">Nazwa jednostki:</span>
+                <span className="ml-2 text-gray-800">{userData.organizationName}</span>
               </div>
               <div>
-                <span className="text-gray-500">NIP:</span>
-                <span className="ml-2 text-gray-900">{userData.nip}</span>
+                <span className="text-indigo-600 font-medium">NIP:</span>
+                <span className="ml-2 text-gray-800">{userData.nip}</span>
               </div>
               <div>
-                <span className="text-gray-500">Składający:</span>
-                <span className="ml-2 text-gray-900">{`${userData.firstName} ${userData.lastName}`}</span>
+                <span className="text-indigo-600 font-medium">Składający:</span>
+                <span className="ml-2 text-gray-800">{`${userData.firstName} ${userData.lastName}`}</span>
               </div>
             </div>
           </div>
         )}
 
-        <div className="bg-gray-50 p-4 rounded-lg mb-6">
+        <div className="bg-gray-50 p-6 rounded-xl mb-8 border border-gray-200">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-700">ID Wniosku:</span>
-            <span className="text-sm font-mono bg-gray-200 px-3 py-1 rounded">{claimId}</span>
+            <span className="text-sm font-semibold text-gray-700">ID Wniosku:</span>
+            <span className="text-sm font-mono bg-gray-100 px-4 py-2 rounded-lg shadow-sm border border-gray-200">{claimId}</span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Nazwa zwyczajowa obiektu
-            </label>
-            <input
-              type="text"
-              {...register('commonName', { required: 'Nazwa zwyczajowa jest wymagana' })}
-              placeholder="np. Szkoła Podstawowa nr 1 im. Jana Kochanowskiego"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-            />
-            {errors.commonName && (
-              <p className="mt-1 text-sm text-red-600">{errors.commonName.message}</p>
-            )}
-          </div>
+        <div className="space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Nazwa zwyczajowa obiektu
+              </label>
+              <input
+                type="text"
+                {...register('commonName', { required: 'Nazwa zwyczajowa jest wymagana' })}
+                placeholder="np. Szkoła Podstawowa nr 1 im. Jana Kochanowskiego"
+                className="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400"
+              />
+              {errors.commonName && (
+                <p className="mt-1 text-sm text-red-600">{errors.commonName.message}</p>
+              )}
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 flex items-center gap-1">
-              ID wniosku z Survey123
-              <div className="relative group">
-                <span className="cursor-help">ℹ️</span>
-                <div className="absolute right-0 w-80 p-2 bg-gray-800 text-white text-sm rounded shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 transform translate-x-2">
-                  Numer wniosku pobierzesz z aplikacji Survey123 która znajduje się pod adresem:{' '}
-                  <a 
-                    href="https://gis-portal.straz.gov.pl/portal/apps/webappviewer/index.html?id=b403009fa5ac4f6c8ea3791fc70afdf3"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-300 hover:text-blue-400 underline"
-                  >
-                    kliknij tutaj
-                  </a>
-                </div>
-              </div>
-            </label>
-            <input
-              type="text"
-              {...register('surveyId', { required: 'ID wniosku jest wymagane' })}
-              placeholder="np. 4056 (ID z aplikacji Survey123)"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-            />
-            {errors.surveyId && (
-              <p className="mt-1 text-sm text-red-600">{errors.surveyId.message}</p>
-            )}
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                ID wniosku z Survey123
+              </label>
+              <input
+                type="text"
+                {...register('surveyId', { required: 'ID wniosku jest wymagane' })}
+                placeholder="np. 4056 (ID z aplikacji Survey123)"
+                className="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400"
+              />
+              {errors.surveyId && (
+                <p className="mt-1 text-sm text-red-600">{errors.surveyId.message}</p>
+              )}
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Nazwa obiektu
-            </label>
-            <input
-              type="text"
-              {...register('objectName', { required: 'Nazwa obiektu jest wymagana' })}
-              placeholder="np. Budynek główny szkoły podstawowej"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-            />
-            {errors.objectName && (
-              <p className="mt-1 text-sm text-red-600">{errors.objectName.message}</p>
-            )}
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Nazwa obiektu
+              </label>
+              <input
+                type="text"
+                {...register('objectName', { required: 'Nazwa obiektu jest wymagana' })}
+                placeholder="np. Budynek główny szkoły podstawowej"
+                className="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400"
+              />
+              {errors.objectName && (
+                <p className="mt-1 text-sm text-red-600">{errors.objectName.message}</p>
+              )}
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Adres uszkodzonego obiektu
-            </label>
-            <input
-              type="text"
-              {...register('address', { required: 'Adres jest wymagany' })}
-              placeholder="np. ul. Szkolna 1, 00-001 Warszawa"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-            />
-            {errors.address && (
-              <p className="mt-1 text-sm text-red-600">{errors.address.message}</p>
-            )}
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Adres uszkodzonego obiektu
+              </label>
+              <input
+                type="text"
+                {...register('address', { required: 'Adres jest wymagany' })}
+                placeholder="np. ul. Szkolna 1, 00-001 Warszawa"
+                className="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400"
+              />
+              {errors.address && (
+                <p className="mt-1 text-sm text-red-600">{errors.address.message}</p>
+              )}
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Ostateczna wycena szkód - kwota netto (PLN)
-            </label>
-            <input
-              type="number"
-              step="100"
-              {...register('finalNetAmount', {
-                required: 'Kwota jest wymagana',
-                min: { value: 0, message: 'Kwota nie może być ujemna' }
-              })}
-              placeholder="np. 150000.00 (kwota netto bez VAT)"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-            />
-            {errors.finalNetAmount && (
-              <p className="mt-1 text-sm text-red-600">{errors.finalNetAmount.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Kwota wnioskowana o dofinansowanie (PLN)
-            </label>
-            <input
-              type="number"
-              step="100"
-              {...register('requestedAmount', {
-                required: 'Kwota jest wymagana',
-                min: { value: 0, message: 'Kwota nie może być ujemna' }
-              })}
-              placeholder="np. 120000.00 (wnioskowana kwota dofinansowania)"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-            />
-            {errors.requestedAmount && (
-              <p className="mt-1 text-sm text-red-600">{errors.requestedAmount.message}</p>
-            )}
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Czy składano wnioski o wsparcie do innych instytucji?
-          </label>
-          <Select
-            isMulti
-            options={MINISTRIES}
-            value={MINISTRIES.filter(m => selectedMinistries.includes(m.value))}
-            onChange={(selected) => {
-              setSelectedMinistries(selected ? selected.map(option => option.value) : []);
-            }}
-            className="mb-2"
-            placeholder="Wybierz instytucje..."
-          />
-          {selectedMinistries.includes('inne') && (
-            <input
-              type="text"
-              value={otherMinistry}
-              onChange={(e) => setOtherMinistry(e.target.value)}
-              placeholder="Wpisz nazwę instytucji..."
-              className="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Województwo
-            </label>
-            <Select
-              options={voivodeships.map(v => ({ value: v, label: v }))}
-              value={selectedVoivodeship ? { value: selectedVoivodeship, label: selectedVoivodeship } : null}
-              onChange={handleVoivodeshipChange}
-              isDisabled={userData?.role === 'user'}
-              className="mt-1"
-              placeholder="Wybierz województwo..."
-            />
-            {errors.voivodeship && (
-              <p className="mt-1 text-sm text-red-600">{errors.voivodeship.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Powiat
-            </label>
-            <Select
-              options={counties.map(c => ({ value: c, label: c }))}
-              value={selectedCounty ? { value: selectedCounty, label: selectedCounty } : null}
-              onChange={handleCountyChange}
-              isDisabled={!selectedVoivodeship}
-              className="mt-1"
-              placeholder="Wybierz powiat..."
-            />
-            {errors.county && (
-              <p className="mt-1 text-sm text-red-600">{errors.county.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Gmina
-            </label>
-            <Select
-              options={communities.map(c => ({ value: c, label: c }))}
-              value={watch('commune') ? { value: watch('commune'), label: watch('commune') } : null}
-              onChange={(selected) => setValue('commune', selected?.value || '')}
-              isDisabled={!selectedCounty}
-              className="mt-1"
-              placeholder="Wybierz gminę..."
-            />
-            {errors.commune && (
-              <p className="mt-1 text-sm text-red-600">{errors.commune.message}</p>
-            )}
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Uwagi
-          </label>
-          <ClaimEditor content={notes} onChange={setNotes} />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Załączniki (PDF, JPG)
-          </label>
-          <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
-            <div className="space-y-1 text-center">
-              <Upload className="mx-auto h-12 w-12 text-gray-400" />
-              <div className="flex text-sm text-gray-600">
-                <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
-                  <span>Dodaj pliki</span>
-                  <input
-                    id="file-upload"
-                    type="file"
-                    multiple
-                    accept=".pdf,.jpg,.jpeg"
-                    onChange={handleFileUpload}
-                    className="sr-only"
-                  />
+            <div className="col-span-2 grid grid-cols-2 gap-6 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-indigo-100 shadow-sm">
+              <div>
+                <label className="block text-base font-semibold text-indigo-900 mb-3">
+                  Ostateczna wycena szkód - kwota netto (PLN)
                 </label>
-                <p className="pl-1">lub przeciągnij i upuść</p>
+                <div className="relative">
+                  <input
+                    type="number"
+                    step="100"
+                    {...register('finalNetAmount', {
+                      required: 'Kwota jest wymagana',
+                      min: { value: 0, message: 'Kwota nie może być ujemna' }
+                    })}
+                    placeholder="np. 150000.00 (kwota netto bez VAT)"
+                    className="block w-full rounded-lg border-2 border-indigo-200 bg-white shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400 text-lg py-3 px-4"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-indigo-500 font-medium">PLN</span>
+                </div>
+                {errors.finalNetAmount && (
+                  <p className="mt-2 text-sm text-red-600">{errors.finalNetAmount.message}</p>
+                )}
               </div>
-              <p className="text-xs text-gray-500">
-                PDF lub JPG do 10MB
-              </p>
+
+              <div>
+                <label className="block text-base font-semibold text-indigo-900 mb-3">
+                  Kwota wnioskowana o dofinansowanie (PLN)
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    step="100"
+                    {...register('requestedAmount', {
+                      required: 'Kwota jest wymagana',
+                      min: { value: 0, message: 'Kwota nie może być ujemna' }
+                    })}
+                    placeholder="np. 120000.00 (wnioskowana kwota dofinansowania)"
+                    className="block w-full rounded-lg border-2 border-red-200 bg-white shadow-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 placeholder-gray-400 text-lg py-3 px-4"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500 font-medium">PLN</span>
+                </div>
+                {errors.requestedAmount && (
+                  <p className="mt-2 text-sm text-red-600">{errors.requestedAmount.message}</p>
+                )}
+              </div>
             </div>
           </div>
 
-          {files.length > 0 && (
-            <ul className="mt-4 divide-y divide-gray-200">
-              {files.map((file, index) => (
-                <li key={index} className="py-3 flex items-center justify-between">
-                  <div className="flex items-center">
-                    <FileCheck className="h-5 w-5 text-gray-400 mr-2" />
-                    <span className="text-sm text-gray-900">{file.name}</span>
-                    <span className="ml-2 text-sm text-gray-500">
-                      ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => removeFile(index)}
-                    className="text-red-600 hover:text-red-800"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Czy składano wnioski o wsparcie do innych instytucji?
+            </label>
+            <Select
+              isMulti
+              options={MINISTRIES}
+              value={MINISTRIES.filter(m => selectedMinistries.includes(m.value))}
+              onChange={(selected) => {
+                setSelectedMinistries(selected ? selected.map(option => option.value) : []);
+              }}
+              className="mb-2"
+              placeholder="Wybierz instytucje..."
+            />
+            {selectedMinistries.includes('inne') && (
+              <input
+                type="text"
+                value={otherMinistry}
+                onChange={(e) => setOtherMinistry(e.target.value)}
+                placeholder="Wpisz nazwę instytucji..."
+                className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400"
+              />
+            )}
+          </div>
 
-        <div className="flex justify-end gap-4">
-          <button
-            type="button"
-            onClick={onBack}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
-          >
-            Anuluj
-          </button>
-          <button
-            type="button"
-            onClick={handleSubmit((data) => handleFormSubmit(data, true))}
-            disabled={isSubmitting}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            <Save className="w-4 h-4 mr-2" />
-            {isSubmitting ? 'Zapisywanie...' : 'Zapisz wersję roboczą'}
-          </button>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            <Send className="w-4 h-4 mr-2" />
-            {isSubmitting ? 'Zapisywanie...' : 'Złóż wniosek'}
-          </button>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Województwo
+              </label>
+              <Select
+                options={voivodeships.map(v => ({ value: v, label: v }))}
+                value={selectedVoivodeship ? { value: selectedVoivodeship, label: selectedVoivodeship } : null}
+                onChange={handleVoivodeshipChange}
+                isDisabled={userData?.role === 'user'}
+                className="mt-1"
+                placeholder="Wybierz województwo..."
+              />
+              {errors.voivodeship && (
+                <p className="mt-1 text-sm text-red-600">{errors.voivodeship.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Powiat
+              </label>
+              <Select
+                options={counties.map(c => ({ value: c, label: c }))}
+                value={selectedCounty ? { value: selectedCounty, label: selectedCounty } : null}
+                onChange={handleCountyChange}
+                isDisabled={!selectedVoivodeship}
+                className="mt-1"
+                placeholder="Wybierz powiat..."
+              />
+              {errors.county && (
+                <p className="mt-1 text-sm text-red-600">{errors.county.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Gmina
+              </label>
+              <Select
+                options={communities.map(c => ({ value: c, label: c }))}
+                value={watch('commune') ? { value: watch('commune'), label: watch('commune') } : null}
+                onChange={(selected) => setValue('commune', selected?.value || '')}
+                isDisabled={!selectedCounty}
+                className="mt-1"
+                placeholder="Wybierz gminę..."
+              />
+              {errors.commune && (
+                <p className="mt-1 text-sm text-red-600">{errors.commune.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Uwagi
+            </label>
+            <ClaimEditor content={notes} onChange={setNotes} />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Załączniki (PDF, JPG)
+            </label>
+            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-indigo-500 transition-colors">
+              <div className="space-y-1 text-center">
+                <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                <div className="flex text-sm text-gray-600">
+                  <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                    <span>Dodaj pliki</span>
+                    <input
+                      id="file-upload"
+                      type="file"
+                      multiple
+                      accept=".pdf,.jpg,.jpeg"
+                      onChange={handleFileUpload}
+                      className="sr-only"
+                    />
+                  </label>
+                  <p className="pl-1">lub przeciągnij i upuść</p>
+                </div>
+                <p className="text-xs text-gray-500">
+                  PDF lub JPG do 10MB
+                </p>
+              </div>
+            </div>
+
+            {files.length > 0 && (
+              <ul className="mt-4 divide-y divide-gray-200">
+                {files.map((file, index) => (
+                  <li key={index} className="py-3 flex items-center justify-between">
+                    <div className="flex items-center">
+                      <FileCheck className="h-5 w-5 text-gray-400 mr-2" />
+                      <span className="text-sm text-gray-900">{file.name}</span>
+                      <span className="ml-2 text-sm text-gray-500">
+                        ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeFile(index)}
+                      className="text-red-600 hover:text-red-800"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div className="flex justify-end gap-4">
+            <button
+              type="button"
+              onClick={onBack}
+              className="px-6 py-3 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors shadow-sm"
+            >
+              Anuluj
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg shadow-md text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+            >
+              {isSubmitting ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Zapisywanie...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  {initialData ? 'Zapisz zmiany' : 'Złóż wniosek'}
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </form>
     </div>
