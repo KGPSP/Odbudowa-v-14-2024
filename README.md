@@ -26,6 +26,22 @@ System Odbudowa 2024 to open-source'owa platforma do zarządzania zgłoszeniami 
 - Repozytorium użytkowników i zgłoszeń
 - Dokumentacja testowa (scenariusze testowe)
 
+## 💻 Dokumentacja Testowa
+
+W katalogu `testy/` znajdują się szczegółowe scenariusze testowe dla różnych ról użytkowników:
+
+- [Użytkownik podstawowy](testy/user_basic.md) - dla zwykłych użytkowników systemu
+- [Administrator Wojewódzki](testy/voivodeship_admin.md) - dla administratorów poziomu wojewódzkiego
+- [Administrator MSWiA](testy/mswia_admin.md) - dla administratorów ministerialnych
+- [Administrator KPRM](testy/kprm_admin.md) - dla administratorów poziomu rządowego
+- [Administrator Systemu](testy/system_admin.md) - dla administratorów technicznych
+
+## 📊 Struktura Bazy Danych
+
+Szczegółowa struktura bazy danych wraz z dokumentacją znajduje się w plikach:
+- `schema.sql` - definicje tabel i relacji
+- `schema_documentation.md` - dokumentacja techniczna bazy danych
+
 ## 💻 Wymagania Systemowe
 
 - Node.js (wersja 14 lub wyższa)
@@ -34,4 +50,4 @@ System Odbudowa 2024 to open-source'owa platforma do zarządzania zgłoszeniami 
 
 ## 🛠️ Instalacja
 
-1. Sklonuj repozytorium: 
+1. Sklonuj repozytorium:
